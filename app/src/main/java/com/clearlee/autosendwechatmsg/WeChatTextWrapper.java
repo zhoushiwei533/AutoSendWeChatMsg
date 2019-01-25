@@ -35,6 +35,39 @@ public class WeChatTextWrapper {
         public static final String WECHATID_CHATUI_USERNAME_ID = "com.tencent.mm:id/ha";
         public static final String WECHATID_CHATUI_BACK_ID = "com.tencent.mm:id/h9";
         public static final String WECHATID_CHATUI_SWITCH_ID = "com.tencent.mm:id/a_x";
+
     }
+
+    public static class WechatId70{
+        /**
+         * 通讯录界面
+         */
+        public static final String WECHATID_CONTACTUI_LISTVIEW_ID = "com.tencent.mm:id/m_";
+        public static final String WECHATID_CONTACTUI_ITEM_ID = "com.tencent.mm:id/n4";
+        public static final String WECHATID_CONTACTUI_NAME_ID = "com.tencent.mm:id/n8";
+        public static final String WECHATID_CONTACTUI_END = "com.tencent.mm:id/azr";
+
+        /**
+         * 聊天记录界面
+         */
+        public static final String WECHATID_LIST_LISTVIEW_ID = "com.tencent.mm:id/cwp";
+        public static final String WECHATID_LIST_ITEM_ID = "com.tencent.mm:id/b4m";
+        public static final String WECHATID_LIST_NAME_ID = "com.tencent.mm:id/b4o";
+        public static final String WECHATID_LIST_NAME_HEAD = "android:id/text1";
+
+
+
+
+
+
+        /**
+         * 聊天界面
+         */
+        public static final String WECHATID_CHATUI_EDITTEXT_ID = "com.tencent.mm:id/alm";
+        public static final String WECHATID_CHATUI_USERNAME_ID = "com.tencent.mm:id/jw";
+        public static final String WECHATID_CHATUI_BACK_ID = "com.tencent.mm:id/jv";
+        public static final String WECHATID_CHATUI_SWITCH_ID = "com.tencent.mm:id/alk";
+    }
+
 
 }

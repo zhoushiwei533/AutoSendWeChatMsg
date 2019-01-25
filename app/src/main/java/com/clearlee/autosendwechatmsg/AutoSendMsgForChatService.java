@@ -12,10 +12,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * 聊天界面搜索群，发消息
  * Created by Clearlee
  * 2017/12/22.
  */
-public class AutoSendMsgService extends AccessibilityService {
+public class AutoSendMsgForChatService extends AccessibilityService {
 
     private static final String TAG = "AutoSendMsgService";
     private List<String> allNameList = new ArrayList<>();
@@ -45,11 +46,14 @@ public class AutoSendMsgService extends AccessibilityService {
 
                 if (currentActivity.equals(WeChatTextWrapper.WechatClass.WECHAT_CLASS_LAUNCHUI)) {
                     handleFlow_LaunchUI();
-                } else if (currentActivity.equals(WeChatTextWrapper.WechatClass.WECHAT_CLASS_CONTACTINFOUI)) {
-                    handleFlow_ContactInfoUI();
-                } else if (currentActivity.equals(WeChatTextWrapper.WechatClass.WECHAT_CLASS_CHATUI)) {
-                    handleFlow_ChatUI();
+
                 }
+//                else if (currentActivity.equals(WeChatTextWrapper.WechatClass.WECHAT_CLASS_CONTACTINFOUI)) {
+//                    handleFlow_LaunchUI();
+//                }
+//                else if (currentActivity.equals(WeChatTextWrapper.WechatClass.WECHAT_CLASS_CHATUI)) {
+//                    handleFlow_ChatUI();
+//                }
             }
             break;
         }
@@ -82,31 +86,36 @@ public class AutoSendMsgService extends AccessibilityService {
         }
     }
 
-    private void handleFlow_ContactInfoUI() {
-        WechatUtils.findTextAndClick(this, "发消息");
-    }
 
+
+    /**
+     * 打开微信首页
+     * **/
     private void handleFlow_LaunchUI() {
 
         try {
             //点击通讯录，跳转到通讯录页面
-            WechatUtils.findTextAndClick(this, "通讯录");
+            WechatUtils.findViewIdAndClick(this,WeChatTextWrapper.WechatId70.WECHATID_LIST_NAME_HEAD);
 
             Thread.sleep(50);
 
             //再次点击通讯录，确保通讯录列表移动到了顶部
-            WechatUtils.findTextAndClick(this, "通讯录");
+            WechatUtils.findViewIdAndClick(this,WeChatTextWrapper.WechatId70.WECHATID_LIST_NAME_HEAD);
 
             Thread.sleep(200);
 
-            //遍历通讯录联系人列表，查找联系人
+            //遍历聊天记录
             AccessibilityNodeInfo itemInfo = TraversalAndFindContacts();
             if (itemInfo != null) {
                 WechatUtils.performClick(itemInfo);
+                //发消息
+                Thread.sleep(500);
+                handleFlow_ChatUI();
             } else {
                 SEND_STATUS = SEND_FAIL;
                 resetAndReturnApp();
             }
+
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -116,7 +125,7 @@ public class AutoSendMsgService extends AccessibilityService {
 
 
     /**
-     * 从头至尾遍历寻找联系人
+     * 从头至尾遍历寻找聊天记录
      *
      * @return
      */
@@ -127,15 +136,15 @@ public class AutoSendMsgService extends AccessibilityService {
         AccessibilityNodeInfo rootNode = getRootInActiveWindow();
         int count=rootNode.getChildCount();
 
-        List<AccessibilityNodeInfo> listview = rootNode.findAccessibilityNodeInfosByViewId(WeChatTextWrapper.WechatId70.WECHATID_CONTACTUI_LISTVIEW_ID);
+        List<AccessibilityNodeInfo> listview = rootNode.findAccessibilityNodeInfosByViewId(WeChatTextWrapper.WechatId70.WECHATID_LIST_LISTVIEW_ID);
 
         //是否滚动到了底部
         boolean scrollToBottom = false;
         if (listview != null && !listview.isEmpty()) {
             while (true) {
                 //获取当前屏幕上的联系人信息
-                List<AccessibilityNodeInfo> nameList = rootNode.findAccessibilityNodeInfosByViewId(WeChatTextWrapper.WechatId70.WECHATID_CONTACTUI_NAME_ID);
-                List<AccessibilityNodeInfo> itemList = rootNode.findAccessibilityNodeInfosByViewId(WeChatTextWrapper.WechatId70.WECHATID_CONTACTUI_ITEM_ID);
+                List<AccessibilityNodeInfo> nameList = rootNode.findAccessibilityNodeInfosByViewId(WeChatTextWrapper.WechatId70.WECHATID_LIST_NAME_ID);
+                List<AccessibilityNodeInfo> itemList = rootNode.findAccessibilityNodeInfosByViewId(WeChatTextWrapper.WechatId70.WECHATID_LIST_ITEM_ID);
 
                 if (nameList != null && !nameList.isEmpty()) {
                     for (int i = 0; i < nameList.size(); i++) {
@@ -150,30 +159,25 @@ public class AutoSendMsgService extends AccessibilityService {
                         if (nickname.equals(WechatUtils.NAME)) {
                             return itemInfo;
                         }
-//                        if (!allNameList.contains(nickname)) {
-//                            allNameList.add(nickname);
-//                        } else if (allNameList.contains(nickname)) {
-//                            Log.d(TAG, "mRepeatCount = " + mRepeatCount);
-//                            if (mRepeatCount == 10) {
-//                                //表示已经滑动到顶部了
-//                                if (scrollToBottom) {
-//                                    Log.d(TAG, "没有找到联系人");
-//                                    //此次发消息操作已经完成
-//                                    hasSend = true;
-//                                    return null;
-//                                }
-//                                scrollToBottom = true;
-//                            }
-//                            mRepeatCount++;
-//                        }
+                        if (!allNameList.contains(nickname)) {
+                            allNameList.add(nickname);
+                        } else if (allNameList.contains(nickname)) {
+                            Log.d(TAG, "mRepeatCount = " + mRepeatCount);
+                            if (mRepeatCount == 3) {
+                                //表示已经滑动到顶部了
+                                if (scrollToBottom) {
+                                    Log.d(TAG, "没有找到联系人");
+                                    //此次发消息操作已经完成
+                                    hasSend = true;
+                                    return null;
+                                }
+                                scrollToBottom = true;
+                            }
+                            mRepeatCount++;
+                        }
                     }
                 }
-                List<AccessibilityNodeInfo> endList=rootNode.findAccessibilityNodeInfosByViewId(WeChatTextWrapper.WechatId70.WECHATID_CONTACTUI_END);
-                if (endList != null && !endList.isEmpty()) {
-                    //表示已经滑动到底部了
-                    Log.d(TAG, "没有找到联系人");
-                    scrollToBottom = true;
-                }
+
 
                 if (!scrollToBottom) {
                     //向下滚动

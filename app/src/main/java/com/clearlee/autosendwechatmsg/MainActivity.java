@@ -13,9 +13,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
-import static com.clearlee.autosendwechatmsg.AutoSendMsgService.SEND_STATUS;
-import static com.clearlee.autosendwechatmsg.AutoSendMsgService.SEND_SUCCESS;
-import static com.clearlee.autosendwechatmsg.AutoSendMsgService.hasSend;
+import static com.clearlee.autosendwechatmsg.AutoSendMsgForChatService.SEND_STATUS;
+import static com.clearlee.autosendwechatmsg.AutoSendMsgForChatService.SEND_SUCCESS;
+import static com.clearlee.autosendwechatmsg.AutoSendMsgForChatService.hasSend;
 import static com.clearlee.autosendwechatmsg.WechatUtils.CONTENT;
 import static com.clearlee.autosendwechatmsg.WechatUtils.NAME;
 
@@ -107,6 +107,7 @@ public class MainActivity extends AppCompatActivity {
         if (!accessibilityManager.isEnabled()) {
             openService();
         } else {
+            hasSend=false;
             new Thread(new Runnable() {
                 @Override
                 public void run() {
